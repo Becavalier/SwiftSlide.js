@@ -144,7 +144,7 @@
 		if(this.currentOrder > this.queueLength) {
 			console.warn("[SwiftSlide Line 76] Please make sure you have set enough layer to slide!");
 			this.currentOrder = this.currentOrder % this.queueLength;
-			if(this.currentOrder == 0) this.currentOrder = 1;
+			if(this.currentOrder == 0) this.currentOrder = this.queueLength;
 		}
 
 		// Get current order pos
@@ -375,7 +375,7 @@
 
 			// Prevent order overflow
 			elementOrder = elementOrder % this.queueLength;
-			if(elementOrder == 0) elementOrder = 1;
+			if(elementOrder == 0) elementOrder = this.queueLength;
 
 			// Params
 			var slideWidth = this.slideDivWidth;
