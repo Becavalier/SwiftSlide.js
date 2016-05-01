@@ -48,6 +48,26 @@
 			return !(typeof(obj) === "undefined"); 
 		};
 
+		SwiftSlide.pocessTween = function(obj) {
+			switch(obj){
+				case "Cubic.easeOut":
+					return SwiftSlide.TweenAlgorithm.Cubic.easeOut;
+				break;
+				case "Cubic.easeIn":
+					return SwiftSlide.TweenAlgorithm.Cubic.easeIn;
+				break;
+				case "Quart.easeOut":
+					return SwiftSlide.TweenAlgorithm.Quart.easeOut;
+				break;
+				case "Quart.easeIn":
+					return SwiftSlide.TweenAlgorithm.Quart.easeIn;
+				break;
+				default:
+					return SwiftSlide.TweenAlgorithm.Cubic.easeOut;
+				break;
+			}
+		};
+
 		SwiftSlide.changeTitle = function(title) {
 			var titleElement = document.querySelector("title");
 			if(titleElement == null)
@@ -115,6 +135,11 @@
 
 		if(SwiftSlide.isNumeric(settings.slideDeviation))
 			this.slideDeviation = settings.slideDeviation;
+
+		if(SwiftSlide.isSet(settings.slideTween))
+			this.slideTween = settings.slideTween;
+		else
+			this.slideTween = "Cubic.easeOut";
 
 		if(this.currentOrder > this.queueLength) {
 			console.warn("[SwiftSlide Line 76] Please make sure you have set enough layer to slide!");
@@ -386,8 +411,8 @@
 
 				var _leftSlide = function(){
 					_leftStart ++;
-					var marginLeft = SwiftSlide.TweenAlgorithm.Cubic.easeOut(_leftStart, 0, slideLeft - slideWidth, _leftDuring);
-					var opacity = SwiftSlide.TweenAlgorithm.Cubic.easeOut(_leftStart, 1, -1, _leftDuring);
+					var marginLeft = SwiftSlide.pocessTween(this.slideTween)(_leftStart, 0, slideLeft - slideWidth, _leftDuring);
+					var opacity = SwiftSlide.pocessTween(this.slideTween)(_leftStart, 1, -1, _leftDuring);
 
 					currentElement.style.marginLeft = marginLeft + "px";
 					currentElement.style.opacity = opacity;
@@ -405,8 +430,8 @@
 				
 				var _rightSlide = function(){
 					_rightStart ++;
-					var marginLeft = SwiftSlide.TweenAlgorithm.Cubic.easeOut(_rightStart, slideWidth, -slideWidth, _rightDuring);
-					var opacity = SwiftSlide.TweenAlgorithm.Cubic.easeOut(_rightStart, 0, 1, _rightDuring);
+					var marginLeft = SwiftSlide.pocessTween(this.slideTween)(_rightStart, slideWidth, -slideWidth, _rightDuring);
+					var opacity = SwiftSlide.pocessTween(this.slideTween)(_rightStart, 0, 1, _rightDuring);
 
 					shiftElement.style.marginLeft = marginLeft + "px";
 					shiftElement.style.opacity = opacity;
@@ -427,8 +452,8 @@
 
 				var _leftSlide = function(){
 					_leftStart ++;
-					var marginLeft = SwiftSlide.TweenAlgorithm.Cubic.easeOut(_leftStart, 0, (slideLeft / 2) + slideWidth, _leftDuring);
-					var opacity = SwiftSlide.TweenAlgorithm.Cubic.easeOut(_leftStart, 1, -1, _leftDuring);
+					var marginLeft = SwiftSlide.pocessTween(this.slideTween)(_leftStart, 0, (slideLeft / 2) + slideWidth, _leftDuring);
+					var opacity = SwiftSlide.pocessTween(this.slideTween)(_leftStart, 1, -1, _leftDuring);
 
 					currentElement.style.marginLeft = marginLeft + "px";
 					currentElement.style.opacity = opacity;
@@ -446,8 +471,8 @@
 
 				var _rightSlide = function(){
 					_rightStart ++;
-					var marginLeft = SwiftSlide.TweenAlgorithm.Cubic.easeOut(_rightStart, -slideWidth, slideWidth, _rightDuring);
-					var opacity = SwiftSlide.TweenAlgorithm.Cubic.easeOut(_rightStart, 0, 1, _rightDuring);
+					var marginLeft = SwiftSlide.pocessTween(this.slideTween)(_rightStart, -slideWidth, slideWidth, _rightDuring);
+					var opacity = SwiftSlide.pocessTween(this.slideTween)(_rightStart, 0, 1, _rightDuring);
 
 					shiftElement.style.marginLeft = marginLeft + "px";
 					shiftElement.style.opacity = opacity;

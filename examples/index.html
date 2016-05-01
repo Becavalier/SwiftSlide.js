@@ -19,12 +19,10 @@
         var swiftSlide = new SwiftSlide(
             {
                 initOrder: 1,
-                slideFrameTime: 10,
+                slideFrameTime: 50,
+                slideTween: "Cubic.easeOut",
                 slideDivWidth: window.innerWidth,
-                slideDeviation: 0,
-                historyStackCallback: function(order){ 
-                    $("a[data-slide='" + order + "']").click();
-                }
+                slideDeviation: 0
             }, 
             [
                 { 

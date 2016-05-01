@@ -1,7 +1,21 @@
-[SwiftSlide](https://github.com/Becavalier/SwiftSlide) — An Optimized Sliding Engin for Javascript (Alpha)
+[SwiftSlide](https://github.com/Becavalier/SwiftSlide) — A Sliding Engin for Javascript (Alpha)
 ==================================================
 
-Where to start?
+How to start?
 --------------------------------------
 
 See examples: https://github.com/Becavalier/SwiftSlide/tree/master/examples
+
+Some Instructions
+--------------------------------------
+
+> Four kinds of Tween Algorithm: 
+
+* Cubic.easeOut
+* Cubic.easeIn
+* Quart.easeOut
+* Quart.easeIn
+
+> See Tween Previews Here:
+
+Easings.net http://easings.net/en
