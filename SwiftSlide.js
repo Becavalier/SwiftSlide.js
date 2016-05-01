@@ -20,14 +20,17 @@
 
 }('SwiftSlide', this, function () {
 
-	'use strict';
+	// Strict mode will cause the following exception:
+	// [Exception: TypeError: 'caller', 'callee', and 'arguments' properties may not be accessed on strict mode functions or the arguments objects for calls to them]
+	// 'use strict';
 	
 	var SwiftSlide = function (settings, optionsBundle) {
 
 		// Self pointer
-		var self = this;
+		var self = this,
+		    eventQueue = [];
 
-		// Internal functions
+		// Internal static functions
 		SwiftSlide.isNumeric = function(obj) {
 			var realStringObj = obj && obj.toString();
 			return !Array.isArray(obj) && (realStringObj - parseFloat(realStringObj) + 1) >= 0;
@@ -41,10 +44,22 @@
 			return Array.isArray(obj);
 		};
 
+		SwiftSlide.isSet = function(obj) {
+			return !(typeof(obj) === "undefined"); 
+		};
+
 		SwiftSlide.changeTitle = function(title) {
 			var titleElement = document.querySelector("title");
+			if(titleElement == null)
+			{
+				console.error("[SwiftSlide Line 51] Can not find title element!");
+				return false;
+			}
+
 			titleElement.innerText = title;
 		};
+
+		// Prototype methods
 
 		SwiftSlide.prototype.shiftOrder = function(order) {
 			if(typeof(this.optionsBundleData) == "undefined") {
@@ -58,13 +73,21 @@
 			}	
 		};
 
-		SwiftSlide.dispatchEvent = function(event) {};
+		SwiftSlide.prototype.addEventToQueue = function(event) {
+			this.eventQueue.push(event);
+		};
+
+		SwiftSlide.prototype.dispatchEvent = function() {
+			var currentEvent = this.eventQueue.shift();
+
+			// ... TODO
+		};
 
 		// Set default configure options ({},[{},{}])
 		var historyStackCallback = false,
 		    slideFrameTime = 12,
-		    slideDivWidth = $(window).width(),
-		    slideDeviation = (window.innerWidth - slideDivWidth) > 0 ? (window.innerWidth - slideDivWidth) : 0;
+		    slideDivWidth = window.innerWidth,
+		    slideDeviation = 0;
 
 		// Check settings
 		if(!SwiftSlide.isArray(optionsBundle)) {
@@ -96,6 +119,7 @@
 		if(this.currentOrder > this.queueLength) {
 			console.warn("[SwiftSlide Line 76] Please make sure you have set enough layer to slide!");
 			this.currentOrder = this.currentOrder % this.queueLength;
+			if(this.currentOrder == 0) this.currentOrder = 1;
 		}
 
 		// Get current order pos
@@ -324,6 +348,10 @@
 		// Core method
 		SwiftSlide.prototype.slideCore = function(elementOrder) {
 
+			// Prevent order overflow
+			elementOrder = elementOrder % this.queueLength;
+			if(elementOrder == 0) elementOrder = 1;
+
 			// Params
 			var slideWidth = this.slideDivWidth;
 			var slideLeft = this.slideDeviation;
@@ -337,10 +365,12 @@
 			var shiftElement = document.querySelector(shiftObject.element);
 
 			// Change title
-			SwiftSlide.changeTitle(shiftObject.title);
+			if(SwiftSlide.isSet(shiftObject.title))
+				SwiftSlide.changeTitle(shiftObject.title);
 
 			// Change history stack
-			SwiftSlide.pushState(shiftOrder, shiftObject.urlDisplay);
+			if(SwiftSlide.isSet(shiftObject.urlDisplay))
+				SwiftSlide.pushState(shiftOrder, shiftObject.urlDisplay);
 
 			// Get requestAnimationFrame() and cancelAnimationFrame() bind to window object
 			SwiftSlide.getAnimationFrameMethod();
@@ -356,23 +386,23 @@
 
 				var _leftSlide = function(){
 					_leftStart ++;
-					var marginLeft = SwiftSlide.TweenAlgorithm.Cubic.easeOut(_leftStart, 0, (slideLeft / 2) - slideWidth, _leftDuring);
+					var marginLeft = SwiftSlide.TweenAlgorithm.Cubic.easeOut(_leftStart, 0, slideLeft - slideWidth, _leftDuring);
 					var opacity = SwiftSlide.TweenAlgorithm.Cubic.easeOut(_leftStart, 1, -1, _leftDuring);
 
 					currentElement.style.marginLeft = marginLeft + "px";
 					currentElement.style.opacity = opacity;
 
 				    if(_leftStart < _leftDuring) 
-				    	window.requestAnimationFrame(_leftSlide);
+				    	window.requestAnimationFrame(arguments.callee);
 				    else{
 				    	currentElement.style.display = "none";
 				    	shiftElement.style.marginLeft = slideWidth + "px";
 				    	shiftElement.style.display = "block";
-						_rightSlide();
+				    	// Call _rightSlide();
+						_rightSlide.apply(this, arguments);
 				    }
 				};
-				_leftSlide();
-
+				
 				var _rightSlide = function(){
 					_rightStart ++;
 					var marginLeft = SwiftSlide.TweenAlgorithm.Cubic.easeOut(_rightStart, slideWidth, -slideWidth, _rightDuring);
@@ -382,8 +412,10 @@
 					shiftElement.style.opacity = opacity;
 
 				    if(_rightStart < _rightDuring) 
-				    	window.requestAnimationFrame(_rightSlide);
+				    	window.requestAnimationFrame(arguments.callee);
 				};
+				// Call _leftSlide();
+				_leftSlide.apply(this, arguments);
 				
 			}else if(shiftOrder < this.currentOrder) {
 
@@ -402,15 +434,15 @@
 					currentElement.style.opacity = opacity;
 
 				    if(_leftStart < _leftDuring) 
-				    	window.requestAnimationFrame(_leftSlide);
+				    	window.requestAnimationFrame(arguments.callee);
 				    else{
 				    	currentElement.style.display = "none";
 				    	shiftElement.style.marginLeft = -slideWidth + "px";
 				    	shiftElement.style.display = "block";
-						_rightSlide();
+						// Call _rightSlide();
+						_rightSlide.apply(this, arguments);
 				    }
 				};
-				_leftSlide();
 
 				var _rightSlide = function(){
 					_rightStart ++;
@@ -421,8 +453,11 @@
 					shiftElement.style.opacity = opacity;
 
 				    if(_rightStart < _rightDuring) 
-				    	window.requestAnimationFrame(_rightSlide);
+				    	window.requestAnimationFrame(arguments.callee);
 				};
+
+				// Call _leftSlide();
+				_leftSlide.apply(this, arguments);
 				
 			}else{
 				return;
