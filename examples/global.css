@@ -11,36 +11,53 @@ html, body{
 
 #container{
 	width: 100%;
-	height: 100%;
 }
 
 #container .slide{
 	width: 100%;
-	height: 100%;
+	height: 300px;
 }
 
 #container .button{
-	position: absolute;
 	bottom: 0px;
     width: 100%;
     height: 50px;
 }
 
-#container .div-1{
+#container .div1-1{
 	background-color: red;
 }
 
-#container .div-2{
+#container .div1-2{
 	background-color: blue;
 	display: none;
 }
 
-#container .div-3{
+#container .div1-3{
 	background-color: green;
 	display: none;
 }
 
-#container .div-4{
+#container .div1-4{
+	background-color: yellow;
+	display: none;
+}
+
+#container .div2-1{
+	background-color: red;
+}
+
+#container .div2-2{
+	background-color: blue;
+	display: none;
+}
+
+#container .div2-3{
+	background-color: green;
+	display: none;
+}
+
+#container .div2-4{
 	background-color: yellow;
 	display: none;
 }

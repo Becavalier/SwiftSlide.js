@@ -1,18 +1,32 @@
-/*
-* SwiftSlide Beta-v0.5 - Internal Use - Copyright © 2015 YHSPY.COM
-* Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-* ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
-* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-* THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+/**
+ * @fileOverview SwiftSlide
+ * @author       yhorg@hotmail.com
+ * @version      0.1.0
+ * @license
+ * SwiftSlide Copyright (c) 2016 YHSPY (https://www.yhspy.com/)
+ *
+ * https://github.com/Becavalier/SwiftSlide
+ *
+ * License:: MIT
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 
 !(function(name, context, definition){
 
@@ -24,11 +38,13 @@
 	// [Exception: TypeError: 'caller', 'callee', and 'arguments' properties may not be accessed on strict mode functions or the arguments objects for calls to them]
 	// 'use strict';
 	
-	var SwiftSlide = function (settings, optionsBundle) {
+	var SwiftSlide = function () {
 
 		// Self pointer
-		var self = this,
-		    eventQueue = [];
+		var self = this;
+			
+		this.transactionBundle = arguments,
+		this.transactionQueue = [];
 
 		// Internal static functions
 		SwiftSlide.isNumeric = function(obj) {
@@ -48,7 +64,11 @@
 			return !(typeof(obj) === "undefined"); 
 		};
 
-		SwiftSlide.pocessTween = function(obj) {
+		SwiftSlide.hasPrototype = function(obj, name) {
+			return obj.hasOwnProperty(name) || (name in obj);
+		};
+
+		SwiftSlide.processTween = function(obj) {
 			switch(obj){
 				case "Cubic.easeOut":
 					return SwiftSlide.TweenAlgorithm.Cubic.easeOut;
@@ -68,100 +88,20 @@
 			}
 		};
 
-		SwiftSlide.changeTitle = function(title) {
+		SwiftSlide.setTitle = function(title) {
 			var titleElement = document.querySelector("title");
 			if(titleElement == null)
 			{
-				console.error("[SwiftSlide Line 51] Can not find title element!");
+				console.error("[SwiftSlide] Can not find <title> element!");
 				return false;
 			}
 
 			titleElement.innerText = title;
 		};
 
-		// Prototype methods
-
-		SwiftSlide.prototype.shiftOrder = function(order) {
-			if(typeof(this.optionsBundleData) == "undefined") {
-				return false;
-			}
-			var optionsBundleData = this.optionsBundleData;
-			for(var i = 0; i < this.queueLength; i ++){
-				if(optionsBundleData[i].order == order) {
-					return optionsBundleData[i];
-				}
-			}	
-		};
-
-		SwiftSlide.prototype.addEventToQueue = function(event) {
-			this.eventQueue.push(event);
-		};
-
-		SwiftSlide.prototype.dispatchEvent = function() {
-			var currentEvent = this.eventQueue.shift();
-
-			// ... TODO
-		};
-
-		// Set default configure options ({},[{},{}])
-		var historyStackCallback = false,
-		    slideFrameTime = 12,
-		    slideDivWidth = window.innerWidth,
-		    slideDeviation = 0;
-
-		// Check settings
-		if(!SwiftSlide.isArray(optionsBundle)) {
-			console.error("[SwiftSlide Line 32] Please make sure you have passed correct optionsBundle!");
-			return false;
-		}	
-
-		// Constructor variables init
-		this.optionsBundleData = optionsBundle;
-		this.queueLength = optionsBundle.length;
-		// Default set to 1
-		this.currentOrder = 1;
-
-		if(SwiftSlide.isFunction(settings.historyStackCallback))
-			this.historyStackCallback = settings.historyStackCallback;
-
-		if(SwiftSlide.isNumeric(settings.slideFrameTime))
-			this.slideFrameTime = settings.slideFrameTime;
-
-		if(SwiftSlide.isNumeric(settings.initOrder))
-			this.currentOrder = settings.initOrder;
-
-		if(SwiftSlide.isNumeric(settings.slideDivWidth))
-			this.slideDivWidth = settings.slideDivWidth;
-
-		if(SwiftSlide.isNumeric(settings.slideDeviation))
-			this.slideDeviation = settings.slideDeviation;
-
-		if(SwiftSlide.isSet(settings.slideTween))
-			this.slideTween = settings.slideTween;
-		else
-			this.slideTween = "Cubic.easeOut";
-
-		if(this.currentOrder > this.queueLength) {
-			console.warn("[SwiftSlide Line 76] Please make sure you have set enough layer to slide!");
-			this.currentOrder = this.currentOrder % this.queueLength;
-			if(this.currentOrder == 0) this.currentOrder = this.queueLength;
-		}
-
-		// Get current order pos
-		this.currentObject = this.shiftOrder(this.currentOrder);
-		
-		
 		SwiftSlide.pushState = function(order, url) {
 			window.history.pushState(order, "", url);
 		};
-
-		if(this.historyStackCallback) {
-			window.addEventListener("popstate", function() {
-			    var currentState = history.state;
-			    self.slideCore(currentState);
-			    self.historyStackCallback.call(this, currentState);								
-			});
-		}
 
 		SwiftSlide.getAnimationFrameMethod = function() {
 			var lastTime = 0;
@@ -196,11 +136,12 @@
 			    };
 			}
 
-			// 只能基于window对象
+			// Only based on window
 			window.requestAnimationFrame = requestAnimationFrame; 
 			window.cancelAnimationFrame = cancelAnimationFrame;
 		};
 
+		// Tween algorithm
 		SwiftSlide.TweenAlgorithm = {
 		    Linear: function(t, b, c, d) { return c*t/d + b; },
 		    Quad: {
@@ -369,29 +310,145 @@
 		        }
 		    }
 		}
-		
-		// Core method
-		SwiftSlide.prototype.slideCore = function(elementOrder) {
 
-			// Prevent order overflow
-			elementOrder = elementOrder % this.queueLength;
-			if(elementOrder == 0) elementOrder = this.queueLength;
+		SwiftSlide.shiftOrder = function(transactionData, order) {
+			if(typeof(transactionData) == "undefined") {
+				return false;
+			}
+
+			for(var i = 0; i < transactionData.length; i ++) {
+				if(transactionData[i].order == order) {
+					return transactionData[i];
+				}
+			}	
+		};
+
+		SwiftSlide.prototype.addTransactionToQueue = function() {
+			for(var i = 0; i < this.transactionBundle.length; i ++) {
+				this.transactionQueue.push(this.transactionBundle[i]);
+			}
+		};
+
+		SwiftSlide.prototype.dispatchTransaction = function(transactionID) {
+			var transactionQueueLength = this.transactionQueue.length;
+			for(var i = 0; i < transactionQueueLength; i ++) {
+				if(this.transactionQueue[i].slideTransactionID == transactionID)
+					return  this.transactionQueue[i];
+				else
+					continue;
+			}
+		};
+
+		SwiftSlide.prototype.validateBundle = function() {
+
+			// Validate bundles and set global default configure options
+			var slideHistoryStackCallback = false,
+				slideInitOrder = 1,
+			    slideFrameTime = 12,
+			    slideTween = "Cubic.easeOut",
+			    slideDivWidth = window.innerWidth,
+			    slideDeviation = 0;
+			    
+			var transactionBundleLength = this.transactionBundle.length;
+
+			for(var i = 0; i < transactionBundleLength; i ++) {
+				if(!SwiftSlide.hasPrototype(this.transactionBundle[i], "slideTransactionID")) {
+					console.error("[SwiftSlide] Please make sure you have passed correct transactionID!");
+					return false;
+				}
+
+				if(!SwiftSlide.hasPrototype(this.transactionBundle[i], "slideBundle")) {
+					console.error("[SwiftSlide] Please make sure you have passed slideBundle!");
+					return false;
+				}
+
+				if(!SwiftSlide.hasPrototype(this.transactionBundle[i], "slideInitOrder") || 
+				   !SwiftSlide.isNumeric(this.transactionBundle[i].slideInitOrder)) {
+					this.transactionBundle[i].slideInitOrder = slideInitOrder;
+				}
+
+				if(!SwiftSlide.hasPrototype(this.transactionBundle[i], "slideTween")) {
+					this.transactionBundle[i].slideTween = slideTween;
+				}
+
+				if(!SwiftSlide.hasPrototype(this.transactionBundle[i], "slideDivWidth") || 
+				   !SwiftSlide.isNumeric(this.transactionBundle[i].slideDivWidth)) {
+					this.transactionBundle[i].slideDivWidth = slideDivWidth;
+				}
+
+				if(!SwiftSlide.hasPrototype(this.transactionBundle[i], "slideDeviation") || 
+				   !SwiftSlide.isNumeric(this.transactionBundle[i].slideDeviation)) {
+					this.transactionBundle[i].slideDeviation = slideDeviation;
+				}
+
+				if(!SwiftSlide.hasPrototype(this.transactionBundle[i], "slideHistoryStackCallback") || 
+				   !SwiftSlide.isFunction(this.transactionBundle[i].slideHistoryStackCallback)) {
+					this.transactionBundle[i].slideHistoryStackCallback = slideHistoryStackCallback;
+				}
+
+				if(!SwiftSlide.hasPrototype(this.transactionBundle[i], "slideFrameTime") || 
+				   !SwiftSlide.isNumeric(this.transactionBundle[i].slideFrameTime)){
+					this.transactionBundle[i].slideFrameTime = slideFrameTime;
+				}
+			}
+		};
+		
+		// Validate bundles
+		this.validateBundle();
+
+		// Add transactions to queue
+		this.addTransactionToQueue();
+
+		// Core sliding method
+		SwiftSlide.prototype.slideCore = function(slideTransactionID, elementOrder) {
+
+			// Dispatch transaction
+			var transaction = this.dispatchTransaction(slideTransactionID);
+
+			// Constructor variables init
+			var thisBundleLength = transaction.slideBundle.length;
+			var currentSlideOrder = transaction.slideInitOrder;
+
+			if(currentSlideOrder > thisBundleLength) {
+				console.warn("[SwiftSlide] Please make sure you have set enough layer to slide!");
+				currentSlideOrder = (currentSlideOrder % thisBundleLength == 0 ? thisBundleLength : currentSlideOrder % thisBundleLength);
+			}
+
+			// Get current order position
+			var currentObject = SwiftSlide.shiftOrder(transaction.slideBundle, currentSlideOrder);
+			
+			// Add to history stack (!!need to fix of conflict!!)
+			if(transaction.slideHistoryStackCallback) {
+				window.addEventListener("popstate", function() {
+				    var currentState = history.state;
+				    self.slideCore(slideTransactionID, currentState);
+				    transaction.slideHistoryStackCallback.call(this, currentState);								
+				});
+			}		
 
 			// Params
-			var slideWidth = this.slideDivWidth;
-			var slideLeft = this.slideDeviation;
+			var slideWidth = transaction.slideDivWidth,
+			    slideLeft = transaction.slideDeviation,
+			    slideFrameTime = transaction.slideFrameTime,
+			    slideTween = transaction.slideTween;
 
 			// Get init shift object and shift order 
-			var shiftObject = this.shiftOrder(elementOrder);
-			var shiftOrder = elementOrder;
+			var shiftOrder = (elementOrder % thisBundleLength == 0 ? thisBundleLength : elementOrder % thisBundleLength);
+			var shiftObject = SwiftSlide.shiftOrder(transaction.slideBundle, shiftOrder);
+
+			// In case of slide to the same element
+			if(shiftOrder == currentSlideOrder) {
+				console.info("[SwiftSlide] Slide to the same element.");
+				return;
+			}
 
 			// Get shift element
-			var currentElement = document.querySelector(self.currentObject.element);
+			var currentElement = document.querySelector(currentObject.element);
 			var shiftElement = document.querySelector(shiftObject.element);
 
 			// Change title
 			if(SwiftSlide.isSet(shiftObject.title))
-				SwiftSlide.changeTitle(shiftObject.title);
+				SwiftSlide.setTitle(shiftObject.title);
 
 			// Change history stack
 			if(SwiftSlide.isSet(shiftObject.urlDisplay))
@@ -401,104 +458,75 @@
 			SwiftSlide.getAnimationFrameMethod();
 
 			// Main method (no compress and merge)
-			if(shiftOrder > this.currentOrder) {
+			var _leftStart = 0,
+			    _leftDuring = slideFrameTime, 
+			    _rightStart = 0, 
+			    _rightDuring = slideFrameTime;
 
-				// Move left action
-				var _leftStart = 0,
-				    _leftDuring = slideFrameTime, 
-				    _rightStart = 0, 
-				    _rightDuring = slideFrameTime;
 
-				var _leftSlide = function(){
-					_leftStart ++;
-					var marginLeft = SwiftSlide.pocessTween(this.slideTween)(_leftStart, 0, slideLeft - slideWidth, _leftDuring);
-					var opacity = SwiftSlide.pocessTween(this.slideTween)(_leftStart, 1, -1, _leftDuring);
+			var _leftSlide = function(){
+				_leftStart ++;
 
-					currentElement.style.marginLeft = marginLeft + "px";
-					currentElement.style.opacity = opacity;
+				var marginLeft;
 
-				    if(_leftStart < _leftDuring) 
-				    	window.requestAnimationFrame(arguments.callee);
-				    else{
-				    	currentElement.style.display = "none";
-				    	shiftElement.style.marginLeft = slideWidth + "px";
-				    	shiftElement.style.display = "block";
-				    	// Call _rightSlide();
-						_rightSlide.apply(this, arguments);
-				    }
-				};
-				
-				var _rightSlide = function(){
-					_rightStart ++;
-					var marginLeft = SwiftSlide.pocessTween(this.slideTween)(_rightStart, slideWidth, -slideWidth, _rightDuring);
-					var opacity = SwiftSlide.pocessTween(this.slideTween)(_rightStart, 0, 1, _rightDuring);
+				if(shiftOrder > currentSlideOrder) 
+					marginLeft = SwiftSlide.processTween(slideTween)(_leftStart, 0, slideLeft - slideWidth, _leftDuring);
+				else if(shiftOrder < currentSlideOrder) 
+					marginLeft = SwiftSlide.processTween(slideTween)(_leftStart, 0, (slideLeft / 2) + slideWidth, _leftDuring);
 
-					shiftElement.style.marginLeft = marginLeft + "px";
-					shiftElement.style.opacity = opacity;
+				var opacity = SwiftSlide.processTween(slideTween)(_leftStart, 1, -1, _leftDuring);
 
-				    if(_rightStart < _rightDuring) 
-				    	window.requestAnimationFrame(arguments.callee);
-				};
-				// Call _leftSlide();
-				_leftSlide.apply(this, arguments);
-				
-			}else if(shiftOrder < this.currentOrder) {
+				currentElement.style.marginLeft = marginLeft + "px";
+				currentElement.style.opacity = opacity;
 
-				// Move right action
-				var _leftStart = 0,
-				    _leftDuring = slideFrameTime, 
-				    _rightStart = 0, 
-				    _rightDuring = slideFrameTime;
+			    if(_leftStart < _leftDuring) 
+			    	window.requestAnimationFrame(arguments.callee);
+			    else{
+			    	currentElement.style.display = "none";
 
-				var _leftSlide = function(){
-					_leftStart ++;
-					var marginLeft = SwiftSlide.pocessTween(this.slideTween)(_leftStart, 0, (slideLeft / 2) + slideWidth, _leftDuring);
-					var opacity = SwiftSlide.pocessTween(this.slideTween)(_leftStart, 1, -1, _leftDuring);
+			    	if(shiftOrder > currentSlideOrder) 
+			    		shiftElement.style.marginLeft = slideWidth + "px";
+			    	else
+			    		shiftElement.style.marginLeft = -slideWidth + "px";
 
-					currentElement.style.marginLeft = marginLeft + "px";
-					currentElement.style.opacity = opacity;
+			    	shiftElement.style.display = "block";
+			    	// Call _rightSlide();
+					_rightSlide.apply(this, arguments);
+			    }
+			};
+			
+			var _rightSlide = function(){
+				_rightStart ++;
 
-				    if(_leftStart < _leftDuring) 
-				    	window.requestAnimationFrame(arguments.callee);
-				    else{
-				    	currentElement.style.display = "none";
-				    	shiftElement.style.marginLeft = -slideWidth + "px";
-				    	shiftElement.style.display = "block";
-						// Call _rightSlide();
-						_rightSlide.apply(this, arguments);
-				    }
-				};
+				var marginLeft;
+				if(shiftOrder > currentSlideOrder) 
+					marginLeft = SwiftSlide.processTween(slideTween)(_rightStart, slideWidth, -slideWidth, _rightDuring);
+				else if(shiftOrder < currentSlideOrder) 
+					marginLeft = SwiftSlide.processTween(slideTween)(_rightStart, -slideWidth, slideWidth, _rightDuring);
 
-				var _rightSlide = function(){
-					_rightStart ++;
-					var marginLeft = SwiftSlide.pocessTween(this.slideTween)(_rightStart, -slideWidth, slideWidth, _rightDuring);
-					var opacity = SwiftSlide.pocessTween(this.slideTween)(_rightStart, 0, 1, _rightDuring);
+				var opacity = SwiftSlide.processTween(slideTween)(_rightStart, 0, 1, _rightDuring);
 
-					shiftElement.style.marginLeft = marginLeft + "px";
-					shiftElement.style.opacity = opacity;
+				shiftElement.style.marginLeft = marginLeft + "px";
+				shiftElement.style.opacity = opacity;
 
-				    if(_rightStart < _rightDuring) 
-				    	window.requestAnimationFrame(arguments.callee);
-				};
+			    if(_rightStart < _rightDuring) 
+			    	window.requestAnimationFrame(arguments.callee);
+			};
 
-				// Call _leftSlide();
-				_leftSlide.apply(this, arguments);
-				
-			}else{
-				return;
-			}
-
-			this.currentOrder = shiftOrder;
-			this.currentObject = shiftObject;
+			// Call _leftSlide();
+			_leftSlide.apply(this, arguments);
+			
+			// Save status
+			transaction.slideInitOrder = shiftOrder;
 			
 		};
 	}
 
 	SwiftSlide.prototype = {
 
-		slideTo: function(elementOrder){		
+		slideTo: function(transactionID, elementOrder){		
 			// Call core method
-			this.slideCore(elementOrder);
+			this.slideCore(transactionID, elementOrder);
 		}
 	}
 
