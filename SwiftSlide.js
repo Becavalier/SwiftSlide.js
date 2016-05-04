@@ -34,15 +34,17 @@
 
 }('SwiftSlide', this, function () {
 
-	// Strict mode will cause the following exception:
+	// Strict mode will cause following exception:
 	// [Exception: TypeError: 'caller', 'callee', and 'arguments' properties may not be accessed on strict mode functions or the arguments objects for calls to them]
+	
 	// 'use strict';
 	
 	var SwiftSlide = function () {
 
 		// Self pointer
 		var self = this;
-			
+		
+		// Init global attributes
 		this.transactionBundle = arguments,
 		this.transactionQueue = [];
 
@@ -69,22 +71,15 @@
 		};
 
 		SwiftSlide.processTween = function(obj) {
-			switch(obj){
-				case "Cubic.easeOut":
-					return SwiftSlide.TweenAlgorithm.Cubic.easeOut;
-				break;
-				case "Cubic.easeIn":
-					return SwiftSlide.TweenAlgorithm.Cubic.easeIn;
-				break;
-				case "Quart.easeOut":
-					return SwiftSlide.TweenAlgorithm.Quart.easeOut;
-				break;
-				case "Quart.easeIn":
-					return SwiftSlide.TweenAlgorithm.Quart.easeIn;
-				break;
-				default:
-					return SwiftSlide.TweenAlgorithm.Cubic.easeOut;
-				break;
+			var tweenMethod = eval("SwiftSlide.TweenAlgorithm." + obj);
+
+			if(typeof(tweenMethod) == "undefined"){
+
+				console.warn("[SwiftSlide] The tween animation method you passed is wrong, using default instead!");
+				return SwiftSlide.TweenAlgorithm.Cubic.easeOut;
+
+			}else{
+				return tweenMethod;
 			}
 		};
 
@@ -99,8 +94,8 @@
 			titleElement.innerText = title;
 		};
 
-		SwiftSlide.pushState = function(order, url) {
-			window.history.pushState(order, "", url);
+		SwiftSlide.pushState = function(statBundle, url) {
+			window.history.pushState(statBundle, "", url);
 		};
 
 		SwiftSlide.getAnimationFrameMethod = function() {
@@ -348,6 +343,8 @@
 			    slideTween = "Cubic.easeOut",
 			    slideDivWidth = window.innerWidth,
 			    slideDeviation = 0;
+
+			var popstateFlag = true;
 			    
 			var transactionBundleLength = this.transactionBundle.length;
 
@@ -390,6 +387,20 @@
 				   !SwiftSlide.isNumeric(this.transactionBundle[i].slideFrameTime)){
 					this.transactionBundle[i].slideFrameTime = slideFrameTime;
 				}
+
+				// Add to history stack (!!need to fix of conflict!!)
+				if(this.transactionBundle[i].slideHistoryStackCallback && popstateFlag) {
+					window.addEventListener("popstate", function() {
+					    var stateBundleJSON = history.state;
+					    var stateBundle = JSON.parse(stateBundleJSON);
+					    var transaction = self.dispatchTransaction(stateBundle.slideTransactionID);
+					  	// Call slide method
+					    self.slideCore(stateBundle.slideTransactionID, stateBundle.shiftOrder);
+					    transaction.slideHistoryStackCallback.call(self, stateBundle.shiftOrder);	
+					    // Set flag
+					    popstateFlag = false;							
+					});
+				}		
 			}
 		};
 		
@@ -416,15 +427,6 @@
 
 			// Get current order position
 			var currentObject = SwiftSlide.shiftOrder(transaction.slideBundle, currentSlideOrder);
-			
-			// Add to history stack (!!need to fix of conflict!!)
-			if(transaction.slideHistoryStackCallback) {
-				window.addEventListener("popstate", function() {
-				    var currentState = history.state;
-				    self.slideCore(slideTransactionID, currentState);
-				    transaction.slideHistoryStackCallback.call(this, currentState);								
-				});
-			}		
 
 			// Params
 			var slideWidth = transaction.slideDivWidth,
@@ -452,8 +454,12 @@
 
 			// Change history stack
 			if(SwiftSlide.isSet(shiftObject.urlDisplay))
-				SwiftSlide.pushState(shiftOrder, shiftObject.urlDisplay);
-
+			{
+				var historyStat = {"slideTransactionID": slideTransactionID, "shiftOrder": shiftOrder};
+				var historyStatBundle = JSON.stringify(historyStat);
+				SwiftSlide.pushState(historyStatBundle, shiftObject.urlDisplay);
+			}
+				
 			// Get requestAnimationFrame() and cancelAnimationFrame() bind to window object
 			SwiftSlide.getAnimationFrameMethod();
 
@@ -461,8 +467,8 @@
 			var _leftStart = 0,
 			    _leftDuring = slideFrameTime, 
 			    _rightStart = 0, 
-			    _rightDuring = slideFrameTime;
-
+			    _rightDuring = slideFrameTime,
+			    _tweenMethod = SwiftSlide.processTween(slideTween);
 
 			var _leftSlide = function(){
 				_leftStart ++;
@@ -470,11 +476,11 @@
 				var marginLeft;
 
 				if(shiftOrder > currentSlideOrder) 
-					marginLeft = SwiftSlide.processTween(slideTween)(_leftStart, 0, slideLeft - slideWidth, _leftDuring);
+					marginLeft = _tweenMethod(_leftStart, 0, slideLeft - slideWidth, _leftDuring);
 				else if(shiftOrder < currentSlideOrder) 
-					marginLeft = SwiftSlide.processTween(slideTween)(_leftStart, 0, (slideLeft / 2) + slideWidth, _leftDuring);
+					marginLeft = _tweenMethod(_leftStart, 0, (slideLeft / 2) + slideWidth, _leftDuring);
 
-				var opacity = SwiftSlide.processTween(slideTween)(_leftStart, 1, -1, _leftDuring);
+				var opacity = _tweenMethod(_leftStart, 1, -1, _leftDuring);
 
 				currentElement.style.marginLeft = marginLeft + "px";
 				currentElement.style.opacity = opacity;
@@ -500,11 +506,11 @@
 
 				var marginLeft;
 				if(shiftOrder > currentSlideOrder) 
-					marginLeft = SwiftSlide.processTween(slideTween)(_rightStart, slideWidth, -slideWidth, _rightDuring);
+					marginLeft = _tweenMethod(_rightStart, slideWidth, -slideWidth, _rightDuring);
 				else if(shiftOrder < currentSlideOrder) 
-					marginLeft = SwiftSlide.processTween(slideTween)(_rightStart, -slideWidth, slideWidth, _rightDuring);
+					marginLeft = _tweenMethod(_rightStart, -slideWidth, slideWidth, _rightDuring);
 
-				var opacity = SwiftSlide.processTween(slideTween)(_rightStart, 0, 1, _rightDuring);
+				var opacity = _tweenMethod(_rightStart, 0, 1, _rightDuring);
 
 				shiftElement.style.marginLeft = marginLeft + "px";
 				shiftElement.style.opacity = opacity;
