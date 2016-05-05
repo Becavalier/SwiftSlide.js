@@ -95,7 +95,11 @@
 		};
 
 		SwiftSlide.pushState = function(statBundle, url) {
-			window.history.pushState(statBundle, "", url);
+			try{
+				window.history.pushState(statBundle, "", url);
+			}catch(e){
+				console.warn("[SwiftSlide] " + e);
+			}
 		};
 
 		SwiftSlide.getAnimationFrameMethod = function() {

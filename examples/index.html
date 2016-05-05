@@ -33,26 +33,33 @@
                 slideTween: "Cubic.easeOut",
                 slideDivWidth: window.innerWidth,
                 slideDeviation: 0,
+                slideHistoryStackCallback: function(order){ 
+                    console.log("EXAMPLE_ONE - " + order);
+                },
                 slideBundle: 
                 [
                     { 
                         order: 1, 
-                        element: ".div1-1"
+                        element: ".div1-1",
+                        // urlDisplay: "/EXAMPLE_ONE - 1"
                     },
 
                     {
                         order: 2, 
-                        element: ".div1-2"
+                        element: ".div1-2",
+                        // urlDisplay: "/EXAMPLE_ONE - 2"
                     },
 
                     {
                         order: 3, 
-                        element: ".div1-3"
+                        element: ".div1-3",
+                        // urlDisplay: "/EXAMPLE_ONE - 3"
                     },
 
                     {
                         order: 4, 
-                        element: ".div1-4"
+                        element: ".div1-4",
+                        // urlDisplay: "/EXAMPLE_ONE - 4"
                     },
 
                 ]
@@ -64,26 +71,33 @@
                 slideTween: "Cubic.easeIn",
                 slideDivWidth: window.innerWidth,
                 slideDeviation: 0,
+                slideHistoryStackCallback: function(order){ 
+                    console.log("EXAMPLE_TWO - " + order);
+                },
                 slideBundle: 
                 [
                     { 
                         order: 1, 
-                        element: ".div2-1"
+                        element: ".div2-1",
+                        // urlDisplay: "/EXAMPLE_TWO - 1"
                     },
 
                     {
                         order: 2, 
-                        element: ".div2-2"
+                        element: ".div2-2",
+                        // urlDisplay: "/EXAMPLE_TWO - 2"
                     },
 
                     {
                         order: 3, 
-                        element: ".div2-3"
+                        element: ".div2-3",
+                        // urlDisplay: "/EXAMPLE_TWO - 3"
                     },
 
                     {
                         order: 4, 
-                        element: ".div2-4"
+                        element: ".div2-4",
+                        // urlDisplay: "/EXAMPLE_TWO - 4"
                     },
 
                 ]
