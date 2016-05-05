@@ -2,10 +2,10 @@
 ==================================================
 
 
-Architecture
+Architecture Preview
 --------------------------------------
 
- ![image](https://github.com/Becavalier/SwiftSlide/tree/master/images/SwiftSlide-Architecture.png)
+ ![image](https://github.com/Becavalier/SwiftSlide/blob/master/images/SwiftSlide-Architecture.png?raw=true)
 
 
 How to start?
