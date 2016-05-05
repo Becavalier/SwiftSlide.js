@@ -8,21 +8,22 @@ Architecture Preview
  ![image](https://github.com/Becavalier/SwiftSlide/blob/master/images-preview/SwiftSlide-Architecture.jpg?raw=true)
 
 
-How to start?
+Where to start?
 --------------------------------------
 
-See examples: https://github.com/Becavalier/SwiftSlide/tree/master/examples
+See examples here: https://github.com/Becavalier/SwiftSlide/tree/master/examples
 
-Some Instructions
+Instructions
 --------------------------------------
 
-> Four kinds of Tween Algorithm: 
+> Support all kinds of Tween Algorithm: 
 
 * Cubic.easeOut
 * Cubic.easeIn
 * Quart.easeOut
 * Quart.easeIn
+* ...
 
-> See Tween Previews Here:
+> See all Tween Algorithm Previews here:
 
-Easings.net http://easings.net/en
+Easing functions cheat sheet: http://easings.net/en
