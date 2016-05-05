@@ -5,7 +5,7 @@
 Architecture Preview
 --------------------------------------
 
- ![image](https://github.com/Becavalier/SwiftSlide/blob/master/images/SwiftSlide-Architecture.png?raw=true)
+ ![image](https://github.com/Becavalier/SwiftSlide/blob/master/images-preview/SwiftSlide-Architecture.jpg?raw=true)
 
 
 How to start?
