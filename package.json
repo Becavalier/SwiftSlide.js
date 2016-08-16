@@ -1,0 +1,27 @@
+{
+  "name": "swiftslide",
+  "version": "1.0.0",
+  "description": "SwiftSlide",
+  "main": "SwiftSlide.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Becavalier/SwiftSlide.git"
+  },
+  "author": "YHSPY",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Becavalier/SwiftSlide/issues"
+  },
+  "homepage": "https://github.com/Becavalier/SwiftSlide#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglifyjs": "^0.6.2"
+  }
+}

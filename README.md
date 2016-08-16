@@ -1,11 +1,11 @@
-[SwiftSlide](https://github.com/Becavalier/SwiftSlide) — A Sliding Engin for Javascript (Alpha)
+[SwiftSlide](https://github.com/Becavalier/SwiftSlide) — A Sliding Engin for Javascript (Beta)
 ==================================================
 
 
 Architecture Preview
 --------------------------------------
 
- ![image](https://github.com/Becavalier/SwiftSlide/blob/master/images-preview/SwiftSlide-Architecture.jpg?raw=true)
+ ![image](https://github.com/Becavalier/SwiftSlide/blob/master/SwiftSlide-Architecture.png?raw=true)
 
 
 Where to start?
